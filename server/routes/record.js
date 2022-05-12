@@ -24,4 +24,30 @@ router.route("/record").get((req, res) => {
     });
 });
 
-// 
+// get a single record by id
+router.route('/record/:id').get((req,res) => {
+    let db_connect = db.getDb();
+    let myquery = {
+        _id: ObjectId( req.params,id )
+    };
+    db_connect
+    .collection('records')
+    .findOne(myquery, (err, res) => {
+        if (err) throw err;
+        res.json(res);
+    });
+});
+
+// Create a new record
+router.route('/record/add').post((req,res)=>{
+  let db_connect = db.getDb();
+  let myobj = {
+    name: req.body.name,
+    description: req.body.description,
+  };
+  db_connect.collection('records').insertOne(myobj, (err,res)=> {
+    if (err) throw err;
+    res.json(res);
+  });
+});
+
