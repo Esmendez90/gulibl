@@ -1,3 +1,4 @@
+const { response } = require("express");
 const express = require("express");
 
 // recordRoutes is an instance of the express router.
@@ -25,29 +26,63 @@ router.route("/record").get((req, res) => {
 });
 
 // get a single record by id
-router.route('/record/:id').get((req,res) => {
-    let db_connect = db.getDb();
-    let myquery = {
-        _id: ObjectId( req.params,id )
-    };
-    db_connect
-    .collection('records')
-    .findOne(myquery, (err, res) => {
-        if (err) throw err;
-        res.json(res);
-    });
+router.route("/record/:id").get((req, res) => {
+  let db_connect = db.getDb();
+  let myquery = {
+    _id: ObjectId(req.params.id),
+  };
+  db_connect.collection("records").findOne(myquery, (err, result) => {
+    if (err) throw err;
+    res.json(result);
+  });
 });
 
 // Create a new record
-router.route('/record/add').post((req,res)=>{
+router.route("/record/add").post((req, res) => {
   let db_connect = db.getDb();
   let myobj = {
     name: req.body.name,
     description: req.body.description,
   };
-  db_connect.collection('records').insertOne(myobj, (err,res)=> {
+  db_connect.collection("records").insertOne(myobj, (err, result) => {
     if (err) throw err;
-    res.json(res);
+    res.json(result);
   });
 });
 
+// Update a record by id
+router.route("/update/:id").post((req, res) => {
+  let db_connect = db.getDb();
+  let myquery = {
+    _id: ObjectId(req.params.id),
+  };
+  let newvalues = {
+    $set: {
+      name: req.body.name,
+      description: req.body.description,
+    },
+  };
+  // Some code is missing here
+  db_connect.collection("records").updateOne(myquery, newvalues, (err, result) => {
+    if (err) throw err;
+    res.json(result);
+  });
+});
+
+//Delete a record
+
+router.route("/:id").delete((req, res) => {
+  let db_connect = db.getDb();
+  let myquery = {
+    _id: ObjectId(req.params.id),
+  };
+  db_connect.collection("records").deleteOne(myquery, (err, result) => {
+    if (err) throw err;
+    console.log("1 Record deleted.");
+    res.json(result);
+  });
+  //db_connect.collection("records").deleteOne({"name":"Carl todd"});
+//62853e54d3d1f83b5bc610b6
+});
+
+module.exports = router;
